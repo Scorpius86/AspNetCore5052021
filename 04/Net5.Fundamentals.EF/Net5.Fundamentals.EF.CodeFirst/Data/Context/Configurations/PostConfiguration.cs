@@ -2,12 +2,12 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore;
-using Net5.Fundamentals.EF.CodeFirst.Data.Contexts;
+using Net5.Fundamentals.EF.CodeFirst.Data.Context;
 using Net5.Fundamentals.EF.CodeFirst.Data.Entities;
 using System;
 
 
-namespace Net5.Fundamentals.EF.CodeFirst.Data.Contexts.Configurations
+namespace Net5.Fundamentals.EF.CodeFirst.Data.Context.Configurations
 {
     public partial class PostConfiguration : IEntityTypeConfiguration<Post>
     {
