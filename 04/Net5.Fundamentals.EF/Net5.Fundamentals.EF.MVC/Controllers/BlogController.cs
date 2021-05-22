@@ -98,5 +98,29 @@ namespace Net5.Fundamentals.EF.MVC.Controllers
             }
             return View(postViewModel);
         }
+
+        [HttpGet]
+        public IActionResult DeletePost(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            PostViewModel postViewModel = _blogService.GetPostById(id.Value);
+            if (postViewModel == null)
+            {
+                return NotFound();
+            }
+
+            return View(postViewModel);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeletePost(int id)
+        {
+            _blogService.DeletePost(id);
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
