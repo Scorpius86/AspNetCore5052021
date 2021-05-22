@@ -10,5 +10,8 @@ namespace Net5.Fundamentals.EF.CodeFirst.Data.Repositories
 {
     public interface IPostRepository:IGenericRepository<Post>
     {
+        List<Post> GetPostByUsuarioIdPropietario(int usuarioId);
+        Post GetPostById(int postId);
+        List<Post> GetPosts();
     }
 }

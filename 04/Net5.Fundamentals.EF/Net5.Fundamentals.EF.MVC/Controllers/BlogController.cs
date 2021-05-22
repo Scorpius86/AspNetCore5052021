@@ -16,8 +16,8 @@ namespace Net5.Fundamentals.EF.MVC.Controllers
             _blogService = blogService;
         }
         public IActionResult Index()
-        {
-            return View();
+        {            
+            return View(_blogService.ListPosts());
         }
     }
 }
