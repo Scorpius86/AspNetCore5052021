@@ -7,6 +7,7 @@ namespace Net5.Fundamentals.EF.MVC.Services
     {
         void DeletePost(int postId);
         PostViewModel GetPostById(int postId);
+        void InsertComment(ComentarioViewModel comentarioViewModel);
         void InsertPost(PostViewModel postViewModel);
         List<PostViewModel> ListPosts();
         bool PostExists(int postId);

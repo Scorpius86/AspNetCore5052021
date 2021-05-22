@@ -26,6 +26,23 @@ namespace Net5.Fundamentals.EF.MVC.Controllers
         {
             return View(_blogService.GetPostById(id));
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateComment([Bind("PostId,Contenido")] ComentarioViewModel comentarioViewModel)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    _blogService.InsertComment(comentarioViewModel);
+                    return RedirectToAction("PostDetails", "Blog", new { id = comentarioViewModel.PostId });
+                }
+                return RedirectToAction("PostDetails", "Blog", new { id = comentarioViewModel.PostId });
+            }catch(Exception ex)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+        }
 
         [HttpGet]
         public IActionResult CreatePost()

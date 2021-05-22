@@ -25,6 +25,24 @@ namespace Net5.Fundamentals.EF.MVC.Services
         {
             return Mapper.PostToPostViewModel(_unitOfWork.Posts.GetPostById(postId));
         }
+        public void InsertComment(ComentarioViewModel comentarioViewModel)
+        {
+            Comentario comentario = Mapper.ComentarioViewModelToComentario(comentarioViewModel);
+            
+            comentario.Post = null;
+            comentario.UsuarioIdActualizacionNavigation = null;
+            comentario.UsuarioIdCreacionNavigation = null;
+            comentario.UsuarioIdPropietarioNavigation = null;
+
+            comentario.FechaActualizacion = DateTime.Now;
+            comentario.FechaCreacion = DateTime.Now;
+            comentario.UsuarioIdPropietario = 1;
+            comentario.UsuarioIdCreacion = 1;
+            comentario.UsuarioIdActualizacion = 1;
+
+            _unitOfWork.Comentarios.Insert(comentario);
+            _unitOfWork.Save();
+        }
         public void InsertPost(PostViewModel postViewModel)
         {
             Post post = Mapper.PostViewModelToPost(postViewModel);
