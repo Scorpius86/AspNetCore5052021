@@ -7,6 +7,10 @@ namespace Net5.Fundamentals.EF.MVC.Models
     {
         public PostViewModel()
         {
+            Comentarios = new List<ComentarioViewModel>();
+            UsuarioPropietario = new UsuarioViewModel();
+            UsuarioCreacion = new UsuarioViewModel();
+            UsuarioActualizacion = new UsuarioViewModel();
         }
 
         public int PostId { get; set; }
