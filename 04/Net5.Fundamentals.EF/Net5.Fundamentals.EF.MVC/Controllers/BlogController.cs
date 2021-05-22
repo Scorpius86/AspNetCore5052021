@@ -19,5 +19,10 @@ namespace Net5.Fundamentals.EF.MVC.Controllers
         {            
             return View(_blogService.ListPosts());
         }
+
+        public IActionResult PostDetails(int id)
+        {
+            return View(_blogService.GetPostById(id));
+        }
     }
 }
