@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Net5.Fundamentals.EF.CodeFirst.Data.Contexts;
-using Net5.Fundamentals.EF.CodeFirst.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,24 +9,23 @@ using System.Threading.Tasks;
 
 namespace Net5.Fundamentals.EF.CodeFirst.Data.Repositories.Base
 {
-    public class GenericRepository
+    public class GenericRepository<TEntity> : IGenericRepository<TEntity>where TEntity:class
     {
         internal Net5FundamentalsEFDatabaseContext _context;
-        internal DbSet<Usuario> _usuarios;
+        internal DbSet<TEntity> _dbSet;
 
         public GenericRepository(Net5FundamentalsEFDatabaseContext context)
         {
             _context = context;
-            _usuarios = _context.Set<Usuario>();
+            _dbSet = _context.Set<TEntity>();
         }
-
-        public virtual List<Usuario> GertAll(
-            Expression<Func<Usuario, bool>> filter = null,
-            Func<IQueryable<Usuario>, IOrderedQueryable<Usuario>> orderBy = null,
+        public virtual List<TEntity> GetAll(
+            Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = ""
         )
         {
-            IQueryable<Usuario> query = _usuarios;
+            IQueryable<TEntity> query = _dbSet;
 
             if(filter != null)
             {
@@ -50,27 +48,35 @@ namespace Net5.Fundamentals.EF.CodeFirst.Data.Repositories.Base
             }
         }
 
-        public virtual Usuario GetById(object id)
+        public virtual TEntity GetById(object id)
         {
-            return _usuarios.Find(id);
+            return _dbSet.Find(id);
         }
 
-        public virtual void Insert(Usuario usuario)
+        public virtual void Insert(TEntity entity)
         {
-            _usuarios.Add(usuario);
+            _dbSet.Add(entity);
         }
 
         public virtual void Delete(object id)
-        {            
-            Usuario usuario  = _usuarios.Find(id);
+        {
+            TEntity entityToDelete = _dbSet.Find(id);
+            Delete(entityToDelete);
 
         }
-        public virtual void Delete(Usuario usuarioToDelete)
+        public virtual void Delete(TEntity entityToDelete)
         {
-            if (_context.Entry(usuarioToDelete).State == EntityState.Detached)
+            if (_context.Entry(entityToDelete).State == EntityState.Detached)
             {
-                _usuarios.Attach(usuarioToDelete)
+                _dbSet.Attach(entityToDelete);
             }
+
+            _dbSet.Remove(entityToDelete);
+        }
+        public virtual void Update(TEntity entityToUpdate)
+        {
+            _dbSet.Attach(entityToUpdate);
+            _context.Entry(entityToUpdate).State = EntityState.Modified;
         }
     }
 }
