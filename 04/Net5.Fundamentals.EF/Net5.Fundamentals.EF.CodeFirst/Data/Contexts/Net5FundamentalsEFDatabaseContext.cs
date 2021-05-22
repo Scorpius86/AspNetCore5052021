@@ -28,9 +28,9 @@ namespace Net5.Fundamentals.EF.CodeFirst.Data.Contexts
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
 
-            modelBuilder.ApplyConfiguration(new ComentarioConfiguration());
-            modelBuilder.ApplyConfiguration(new PostConfiguration());
-            modelBuilder.ApplyConfiguration(new UsuarioConfiguration());
+            modelBuilder.ApplyConfiguration(new Configurations.ComentarioConfiguration());
+            modelBuilder.ApplyConfiguration(new Configurations.PostConfiguration());
+            modelBuilder.ApplyConfiguration(new Configurations.UsuarioConfiguration());
             OnModelCreatingPartial(modelBuilder);
         }
 

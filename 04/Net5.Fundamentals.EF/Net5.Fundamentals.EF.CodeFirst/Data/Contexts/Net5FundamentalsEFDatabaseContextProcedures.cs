@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,11 +10,26 @@ using Net5.Fundamentals.EF.CodeFirst.Data.Entities;
 
 namespace Net5.Fundamentals.EF.CodeFirst.Data.Contexts
 {
-    public static class Net5FundamentalsEFDatabaseContextProceduresExtensions
+    public partial class Net5FundamentalsEFDatabaseContext
     {
-        public static Net5FundamentalsEFDatabaseContextProcedures GetProcedures(this Net5FundamentalsEFDatabaseContext context)
+        private Net5FundamentalsEFDatabaseContextProcedures _procedures;
+
+        public Net5FundamentalsEFDatabaseContextProcedures Procedures
         {
-            return new Net5FundamentalsEFDatabaseContextProcedures(context);
+            get
+            {
+                if (_procedures is null) _procedures = new Net5FundamentalsEFDatabaseContextProcedures(this);
+                return _procedures;
+            }
+            set
+            {
+                _procedures = value;
+            }
+        }
+
+        public Net5FundamentalsEFDatabaseContextProcedures GetProcedures()
+        {
+            return Procedures;
         }
     }
 
@@ -26,7 +42,7 @@ namespace Net5.Fundamentals.EF.CodeFirst.Data.Contexts
             _context = context;
         }
 
-        public async Task<uspListPostResult[]> uspListPostAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
+        public virtual async Task<uspListPostResult[]> uspListPostAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
         {
             var parameterreturnValue = new SqlParameter
             {

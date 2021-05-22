@@ -8,6 +8,7 @@
    "ModelNamespace": null,
    "OutputContextPath": "Data\/Contexts",
    "OutputPath": "Data\/Entities",
+   "ProceduresReturnList": false,
    "ProjectRootNamespace": "Net5.Fundamentals.EF.CodeFirst",
    "Schemas": null,
    "SelectedHandlebarsLanguage": 0,
