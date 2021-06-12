@@ -23,6 +23,10 @@ using Net5.AspNet.MVC.Infrastructure.Helper.Error;
 using Net5.AspNet.MVC.Infrastructure.Constants;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
+using IdentityModel;
+using static IdentityModel.OidcConstants;
 
 namespace Net5.AspNet.MVC.Client
 {
@@ -43,8 +47,7 @@ namespace Net5.AspNet.MVC.Client
                 opt.Filters.Add(new AuthorizeFilter());
              })
                 .AddRazorRuntimeCompilation();
-            services.AddRazorPages().AddRazorRuntimeCompilation();
-
+            
             services.AddHttpContextAccessor();
             services.AddBlogRepositories(opt=> opt.ConnectionString = Configuration.GetConnectionString("BlogContextConnection"));
             services.AddAuditRepositories(opt => opt.ConnectionString = Configuration.GetConnectionString("AuditContextConnection"));
@@ -58,16 +61,37 @@ namespace Net5.AspNet.MVC.Client
                 opt.AddPolicy(Policies.DeletePost, policy => policy.RequireClaim("GrantAccess", GrantAccess.Delete));
             });
 
-            services.AddAuthentication(opt=>
+            services.AddAuthentication(opt =>
             {
-                opt.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                opt.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 opt.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+            })
+            .AddCookie(opt=>
+            {
+                opt.AccessDeniedPath = "/Account/AccessDenied";
             })
             .AddOpenIdConnect(opt =>
             {
-                opt.Authority = "http://locahost:44320";
+                opt.Authority = "https://localhost:44320";
+                opt.ClientId = "Net5.AspNet.MVC.Client";
 
-            })
+                opt.ClientSecret = "49C1A7E1-0C79-4A89-A3D6-A37998FB86B0";
+                opt.Scope.Add("Net5.AspNet.MVC");
+
+                opt.SaveTokens = true;
+
+                opt.GetClaimsFromUserInfoEndpoint = true;
+                opt.ClaimActions.MapJsonKey(ClaimTypes.Role, ClaimTypes.Role);
+                opt.ClaimActions.MapJsonKey(JwtClaimTypes.Role, JwtClaimTypes.Role);
+                opt.ClaimActions.MapJsonKey(SecurityClaimType.GrantAccess, SecurityClaimType.GrantAccess);
+
+                opt.ResponseType = ResponseTypes.Code;
+                opt.ResponseMode = ResponseModes.FormPost;
+
+                opt.UsePkce = true;
+                opt.TokenValidationParameters.RoleClaimType = JwtClaimTypes.Role;
+                opt.TokenValidationParameters.NameClaimType = JwtClaimTypes.Name;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -85,16 +109,12 @@ namespace Net5.AspNet.MVC.Client
                 app.UseHsts();
             }
 
-            var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
-            var scope = scopeFactory.CreateScope();            
-            SecuritySeedData.Initialize(scope.ServiceProvider);
-
+            
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseAuthentication();
-
             app.UseRouting();
-                        
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -102,8 +122,6 @@ namespace Net5.AspNet.MVC.Client
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-                endpoints.MapRazorPages();
             });
         }
     }
