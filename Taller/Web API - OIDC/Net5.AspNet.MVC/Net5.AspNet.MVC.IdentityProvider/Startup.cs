@@ -32,7 +32,7 @@ namespace Net5.AspNet.MVC.IdentityProvider
             services.AddControllersWithViews();
 
             services.AddDbContext<SecurityContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("SecurityConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("SecurityConnection")));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<SecurityContext>()
