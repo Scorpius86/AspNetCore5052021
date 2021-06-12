@@ -1,73 +1,82 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Net5.AspNet.MVC.Client.Helper;
 using Net5.AspNet.MVC.Client.Models;
-using Net5.AspNet.MVC.Client.Services;
+using Net5.AspNet.MVC.Infrastructure.Agents.Comments;
+using Net5.AspNet.MVC.Infrastructure.Agents.Posts;
 using Net5.AspNet.MVC.Infrastructure.Constants;
+using Net5.AspNet.MVC.Infrastructure.Dtos;
 using Net5.AspNet.MVC.Infrastructure.Helper.Audit;
 using Net5.AspNet.MVC.Infrastructure.Helper.Log;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Net5.AspNet.MVC.Client.Controllers
 {
     [ServiceFilter(typeof(LogFilter))]
-    [Audit]    
+    [Audit]
     public class BlogController : Controller
     {
-        private readonly IBlogService _blogService;
-        public BlogController(IBlogService blogService)
+        private readonly IPostAgent _postAgent;
+        private readonly ICommentsAgent _comentariosAgent;
+        private readonly IMapper _mapper;
+        public BlogController(IPostAgent postAgent, ICommentsAgent comentariosAgent, IMapper mapper)
         {
-            _blogService = blogService;
-        }        
-        public ActionResult Index()
-        {            
-            return View(_blogService.ListPosts());
+            _postAgent = postAgent;
+            _comentariosAgent = comentariosAgent;
+            _mapper = mapper;
         }
-        public ActionResult PostDetails(int id)
+        public async Task<ActionResult> IndexAsync()
         {
-            return View(_blogService.GetPostById(id));
-        }                
+            return View(_mapper.Map<List<PostViewModel>>(await _postAgent.ListPostsAsync()));
+        }
+        public async Task<ActionResult> PostDetailsAsync(int id)
+        {
+            return View(_mapper.Map<PostViewModel>(await _postAgent.GetPostByIdAsync(id)));
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult CreateComment([Bind("PostId,Contenido")] ComentarioViewModel comentarioViewModel)
+        public async Task<ActionResult> CreateCommentAsync([Bind("PostId,Contenido")] ComentarioViewModel comentarioViewModel)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    _blogService.InsertComment(comentarioViewModel);                    
+                    await _comentariosAgent.InsertCommentsAsync(comentarioViewModel.PostId, _mapper.Map<ComentarioDto>(comentarioViewModel));
                     return RedirectToAction("PostDetails", "Blog", new { id = comentarioViewModel.PostId });
                 }
                 return RedirectToAction("PostDetails", "Blog", new { id = comentarioViewModel.PostId });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(IndexAsync));
             }
         }
-                
+
         [Authorize(Roles = Roles.AdministratorOrPowerUser)]
         public ActionResult CreatePost()
-        {            
+        {
             return View();
         }
 
         [HttpPost]
-        [Authorize(Roles = Roles.AdministratorOrPowerUser)]        
+        [Authorize(Roles = Roles.AdministratorOrPowerUser)]
         [ValidateAntiForgeryToken]
-        public ActionResult CreatePost([Bind("Titulo,Resumen,Contenido")] PostViewModel postViewModel)
+        public async Task<ActionResult> CreatePostAsync([Bind("Titulo,Resumen,Contenido")] PostViewModel postViewModel)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    _blogService.InsertPost(postViewModel);
-                    return RedirectToAction(nameof(Index));
+                    await _postAgent.InsertPostAsync(_mapper.Map<PostDto>(postViewModel));
+                    return RedirectToAction(nameof(IndexAsync));
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(IndexAsync));
             }
             catch (Exception ex)
             {
@@ -77,25 +86,25 @@ namespace Net5.AspNet.MVC.Client.Controllers
         }
 
         [Authorize(Policy = Policies.EditPost)]
-        public IActionResult EditPost(int? id)
+        public async Task<IActionResult> EditPostAsync(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            PostViewModel postViewModel = _blogService.GetPostById(id.Value);
+            PostViewModel postViewModel = _mapper.Map<PostViewModel>(await _postAgent.GetPostByIdAsync(id.Value));
             if (postViewModel == null)
             {
                 return NotFound();
             }
-            
+
             return View(postViewModel);
         }
         [HttpPost]
         [Authorize(Policy = Policies.EditPost)]
         [ValidateAntiForgeryToken]
-        public IActionResult EditPost(int id, [Bind("PostId,Titulo,Resumen,Contenido")] PostViewModel postViewModel)
+        public async Task<IActionResult> EditPostAsync(int id, [Bind("PostId,Titulo,Resumen,Contenido")] PostViewModel postViewModel)
         {
             if (id != postViewModel.PostId)
             {
@@ -106,11 +115,11 @@ namespace Net5.AspNet.MVC.Client.Controllers
             {
                 try
                 {
-                    _blogService.UpdatePost(postViewModel);
+                    await _postAgent.UpdatePostAsync(id, _mapper.Map<PostDto>(postViewModel));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_blogService.PostExists(postViewModel.PostId))
+                    if (!await _postAgent.PostExistsAsync(postViewModel.PostId))
                     {
                         return NotFound();
                     }
@@ -119,21 +128,21 @@ namespace Net5.AspNet.MVC.Client.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(IndexAsync));
             }
-            
+
             return View(postViewModel);
         }
 
         [Authorize(Policy = Policies.DeletePost)]
-        public IActionResult DeletePost(int? id)
+        public async System.Threading.Tasks.Task<IActionResult> DeletePostAsync(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            PostViewModel postViewModel = _blogService.GetPostById(id.Value);
+            PostViewModel postViewModel = _mapper.Map<PostViewModel>(await _postAgent.GetPostByIdAsync(id.Value));
             if (postViewModel == null)
             {
                 return NotFound();
@@ -144,12 +153,13 @@ namespace Net5.AspNet.MVC.Client.Controllers
         [HttpPost, ActionName("DeletePost")]
         [Authorize(Policy = Policies.DeletePost)]
         [ValidateAntiForgeryToken]
-        public IActionResult DeletePostConfirmed(int id)
+        public async Task<IActionResult> DeletePostConfirmedAsync(int id)
         {
-            _blogService.DeletePost(id);
-            return RedirectToAction(nameof(Index));
+            await _postAgent.DeletePostAsync(id);
+            return RedirectToAction(nameof(IndexAsync));
         }
 
+        [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Errorpage()
         {

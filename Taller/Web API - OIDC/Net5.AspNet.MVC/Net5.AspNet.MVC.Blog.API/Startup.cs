@@ -9,9 +9,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Net5.AspNet.MVC.Blog.API.Services;
 using Net5.AspNet.MVC.Infrastructure.Data.Blog.Repositories;
+using Net5.AspNet.MVC.Infrastructure.Helper.Mapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Net5.AspNet.MVC.Blog.API
@@ -28,7 +30,7 @@ namespace Net5.AspNet.MVC.Blog.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper(typeof(Profile).GetTypeInfo().Assembly);
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
