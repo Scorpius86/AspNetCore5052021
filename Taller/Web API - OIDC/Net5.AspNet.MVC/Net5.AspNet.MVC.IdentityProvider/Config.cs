@@ -2,8 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using IdentityModel;
 using IdentityServer4.Models;
+using Net5.AspNet.MVC.Infrastructure.Constants;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace Net5.AspNet.MVC.IdentityProvider
 {
@@ -12,8 +15,17 @@ namespace Net5.AspNet.MVC.IdentityProvider
         public static IEnumerable<IdentityResource> IdentityResources =>
                    new IdentityResource[]
                    {
-                new IdentityResources.OpenId(),
-                new IdentityResources.Profile(),
+                        new IdentityResources.OpenId(),
+                        new IdentityResources.Email(),
+                        new IdentityResources.Profile(),
+                        new IdentityResource
+                        {
+                            Name= "Net5.AspNet.MVC",
+                            DisplayName="Net5.AspNet.MVC OIC Profile",
+                            Description="Your Net5.AspNet.MVC OIC profile information (full name, role, permission)",
+                            Emphasize=true,
+                            UserClaims={ SecurityClaimType.GrantAccess,ClaimTypes.Role,JwtClaimTypes.Role,JwtClaimTypes.Name }
+                        }
                    };
 
         public static IEnumerable<ApiScope> ApiScopes =>
@@ -53,6 +65,23 @@ namespace Net5.AspNet.MVC.IdentityProvider
                     AllowOfflineAccess = true,
                     AllowedScopes = { "openid", "profile", "scope2" }
                 },
+                new Client
+                {
+                    ClientId="Net5.AspNet.MVC.Client",
+                    ClientName="Net5.AspNet.MVC.Client",
+                    ClientSecrets = { new Secret("49C1A7E1-0C79-4A89-A3D6-A37998FB86B0".Sha256()) },
+                    AllowedGrantTypes = { GrantType.AuthorizationCode},
+                    RequirePkce = true,
+                    AllowedScopes ={ "openid","profile","mail", "Net5.AspNet.MVC" },
+                    AccessTokenType = AccessTokenType.Reference,
+
+                    RedirectUris = { "https://localhost:44342/signin-oidc" },
+                    PostLogoutRedirectUris = { "https://localhost:44342/signout-callback-oidc" },
+                    FrontChannelLogoutUri =  "https://localhost:44342/signout-oidc",
+
+                    BackChannelLogoutSessionRequired = true,
+                    BackChannelLogoutUri = "https://localhost:44342/Account/SignOut"
+                }
             };
     }
 }

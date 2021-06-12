@@ -7,7 +7,6 @@
   <ItemGroup>
     <PackageReference Include="AspectInjector" Version="2.5.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.4" />
@@ -41,7 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\**\*;Views;appsettings.json;nlog.config;web.config">
+    <Content Update="wwwroot\**\*;Views;Areas\**\Views;appsettings.json;nlog.config;web.config">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>

@@ -20,9 +20,7 @@ using Net5.AspNet.MVC.Infrastructure.Data.Blog.Repositories;
 using Net5.AspNet.MVC.Infrastructure.Data.Audit.Repositories;
 using Net5.AspNet.MVC.Infrastructure.Helper.Log;
 using Net5.AspNet.MVC.Infrastructure.Helper.Error;
-using Net5.AspNet.MVC.Infrastructure.Constants;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Net5.AspNet.MVC.Infrastructure.Data.Security;
 
 namespace Net5.AspNet.MVC.Client
 {
@@ -51,23 +49,6 @@ namespace Net5.AspNet.MVC.Client
             services.AddServices();
 
             services.AddScoped<LogFilter>();
-
-            services.AddAuthorization(opt =>
-            {
-                opt.AddPolicy(Policies.EditPost, policy => policy.RequireClaim("GrantAccess", GrantAccess.Edit));
-                opt.AddPolicy(Policies.DeletePost, policy => policy.RequireClaim("GrantAccess", GrantAccess.Delete));
-            });
-
-            services.AddAuthentication(opt=>
-            {
-                opt.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                opt.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-            })
-            .AddOpenIdConnect(opt =>
-            {
-                opt.Authority = "http://locahost:44320";
-
-            })
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
