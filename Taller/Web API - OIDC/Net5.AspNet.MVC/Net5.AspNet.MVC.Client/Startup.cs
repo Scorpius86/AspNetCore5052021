@@ -48,11 +48,9 @@ namespace Net5.AspNet.MVC.Client
              })
                 .AddRazorRuntimeCompilation();
             
-            services.AddHttpContextAccessor();
-            services.AddBlogRepositories(opt=> opt.ConnectionString = Configuration.GetConnectionString("BlogContextConnection"));
+            services.AddHttpContextAccessor();            
             services.AddAuditRepositories(opt => opt.ConnectionString = Configuration.GetConnectionString("AuditContextConnection"));
-            services.AddServices();
-
+            
             services.AddScoped<LogFilter>();
 
             services.AddAuthorization(opt =>

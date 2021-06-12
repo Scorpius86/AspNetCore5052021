@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Net5.AspNet.MVC.Infrastruct
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Net5.AspNet.MVC.IdentityProvider", "Net5.AspNet.MVC.IdentityProvider\Net5.AspNet.MVC.IdentityProvider.csproj", "{33FB4F92-06E0-4772-85EC-7DE9DB3F28EE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Net5.AspNet.MVC.Blog.API", "Net5.AspNet.MVC.Blog.API\Net5.AspNet.MVC.Blog.API.csproj", "{97A84638-33C6-45E8-9C56-E9BDD80683AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{33FB4F92-06E0-4772-85EC-7DE9DB3F28EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33FB4F92-06E0-4772-85EC-7DE9DB3F28EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33FB4F92-06E0-4772-85EC-7DE9DB3F28EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97A84638-33C6-45E8-9C56-E9BDD80683AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97A84638-33C6-45E8-9C56-E9BDD80683AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97A84638-33C6-45E8-9C56-E9BDD80683AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97A84638-33C6-45E8-9C56-E9BDD80683AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -66,7 +67,8 @@ namespace Net5.AspNet.MVC.Infrastructure.Helper.Audit
                 AuditLog auditLog = new AuditLog
                 {
                     Time = _time,
-                    UserName = context.HttpContext.User.Identity.Name,
+                    //UserName = context.HttpContext.User.Claims.Where(c=>c.Type == ClaimTypes.Name).FirstOrDefault().Value,                    
+                    UserName = "test",
                     Service = ((Controller)context.Controller).ControllerContext.ActionDescriptor.ControllerTypeInfo.Name,
                     Action = ((ControllerActionDescriptor)context.ActionDescriptor).ActionName,
                     Duration = executionTime,
